@@ -1,0 +1,5 @@
+name: MCWeb
+version: 1.0
+main: work.novablog.mcplugin.mcweb.MCWeb
+api-version: 1.19
+authors: [nova27]
