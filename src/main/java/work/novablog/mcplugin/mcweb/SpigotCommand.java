@@ -54,6 +54,7 @@ public class SpigotCommand implements CommandExecutor {
 
         if ("schem".equals(args[0])) {
             schemCommand((Player) sender);
+            sender.sendMessage(ChatColor.GREEN + "Schematic successfully saved.");
             return true;
         }else {
             return false;

@@ -9,10 +9,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.Region;
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.io.NamedTag;
-import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.DoubleTag;
-import net.querz.nbt.tag.ListTag;
-import net.querz.nbt.tag.StringTag;
+import net.querz.nbt.tag.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -38,19 +35,28 @@ public class SchematicWriter {
 
         var entitiesData = new ListTag<>(CompoundTag.class);
         for(var entity : clipboard.getEntities()) {
+            var entityId = Objects.requireNonNull(entity.getState()).getType().toString();
+            if(entityId.equals("item")) continue;
+            var entityLocation = entity.getLocation();
+            var regionMinimumPoint = region.getMinimumPoint();
+
             CompoundTag entityData = new CompoundTag();
 
-            entityData.put("Id", new StringTag(Objects.requireNonNull(entity.getState()).getType().toString()));
+            entityData.put("Id", new StringTag(entityId));
             var entityPosData = new ListTag<>(DoubleTag.class);
-            entityPosData.addDouble(entity.getLocation().getX() - region.getMinimumPoint().getX());
-            entityPosData.addDouble(entity.getLocation().getY() - region.getMinimumPoint().getY());
-            entityPosData.addDouble(entity.getLocation().getZ() - region.getMinimumPoint().getZ());
+            entityPosData.addDouble(entityLocation.getX() - regionMinimumPoint.getX());
+            entityPosData.addDouble(entityLocation.getY() - regionMinimumPoint.getY());
+            entityPosData.addDouble(entityLocation.getZ() - regionMinimumPoint.getZ());
             entityData.put("Pos", entityPosData);
+            var entityRotationData = new ListTag<>(FloatTag.class);
+            entityRotationData.addFloat(entityLocation.getYaw());
+            entityRotationData.addFloat(entityLocation.getPitch());
+            entityData.put("Rotation", entityRotationData);
 
             entitiesData.add(entityData);
         }
 
         root.put("Entities", entitiesData);
-        NBTUtil.write(new NamedTag("Schematic", root), file, false);  //TODO trueはprismarinejsでエラー
+        NBTUtil.write(new NamedTag("Schematic", root), file, true);
     }
 }
