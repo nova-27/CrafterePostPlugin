@@ -62,6 +62,6 @@ public class SchematicWriter {
         }
 
         root.put("Entities", entitiesData);
-        NBTUtil.write(new NamedTag("Schematic", root), file, true);
+        NBTUtil.write(new NamedTag("Schematic", root), file);
     }
 }

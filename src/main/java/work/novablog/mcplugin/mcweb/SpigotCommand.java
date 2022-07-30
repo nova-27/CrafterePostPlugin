@@ -46,8 +46,9 @@ public class SpigotCommand implements CommandExecutor {
 
     private void recordCommand(@NotNull Player player) {
         var recordingManager = MCWeb.getInstance().getRecordingManager();
+        var uuid = player.getUniqueId();
 
-        if(recordingManager.stopRecording(player)) {
+        if(recordingManager.stopRecording(uuid)) {
             player.sendMessage(ChatColor.BLUE + "Recording stopped.");
             return;
         }
@@ -60,7 +61,7 @@ public class SpigotCommand implements CommandExecutor {
             return;
         }
 
-        recordingManager.startRecording(player, region);
+        recordingManager.startRecording(uuid, region);
         player.sendMessage(ChatColor.BLUE + "Recording started.");
     }
 

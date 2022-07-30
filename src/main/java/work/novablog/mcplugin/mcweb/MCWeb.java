@@ -10,13 +10,7 @@ import java.util.logging.Level;
 
 public class MCWeb extends JavaPlugin {
     private static MCWeb instance;
-    private final RecordingManager recordingManager;
-
-    public MCWeb() {
-        super();
-        instance = this;
-        recordingManager = new RecordingManager();
-    }
+    private RecordingManager recordingManager;
 
     public static MCWeb getInstance() {
         return instance;
@@ -28,6 +22,9 @@ public class MCWeb extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+        recordingManager = new RecordingManager();
+
         if(!getDataFolder().isDirectory() && !getDataFolder().mkdirs()) {
             getLogger().log(Level.SEVERE, "Failed to create the plugin directory!");
             return;
