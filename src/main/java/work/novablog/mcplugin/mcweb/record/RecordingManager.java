@@ -14,10 +14,15 @@ import java.util.*;
 
 public class RecordingManager extends BukkitRunnable implements Listener {
     private final Map<UUID, RecordingWriter> recordings;
+    private final BukkitEventListener bukkitEventListener;
+    private long elapsedTicks;
 
     public RecordingManager() {
         recordings = new HashMap<>();
+        bukkitEventListener = new BukkitEventListener();
+        elapsedTicks = 0;
         Bukkit.getServer().getPluginManager().registerEvents(this, MCWeb.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(bukkitEventListener, MCWeb.getInstance());
     }
 
     /**
@@ -53,12 +58,12 @@ public class RecordingManager extends BukkitRunnable implements Listener {
         if(!isRecording(uuid)) return false;
 
         RecordingWriter recording = recordings.get(uuid);
+        recordings.remove(uuid);
         try {
             recording.save();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        recordings.remove(uuid);
 
         return true;
     }
@@ -80,7 +85,13 @@ public class RecordingManager extends BukkitRunnable implements Listener {
 
     @Override
     public void run() {
-        MCWeb.getInstance().getLogger().info("テスト");
-        //TODO 書き込み処理
+        var receivedEvents = bukkitEventListener.getReceivedEvents();
+        for (var recording : recordings.values()) {
+            for (var event : receivedEvents) {
+                recording.writeEvent(event, elapsedTicks);
+            }
+        }
+        bukkitEventListener.clearReceivedEvents();
+        elapsedTicks++;
     }
 }
