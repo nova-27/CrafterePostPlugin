@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 public class SpigotCommand implements CommandExecutor {
-    private Region getSelection(Player player) throws IncompleteRegionException {
+    private Region getSelection(@NotNull Player player) throws IncompleteRegionException {
         BukkitPlayer actor = BukkitAdapter.adapt(player);
         SessionManager manager = WorldEdit.getInstance().getSessionManager();
         LocalSession localSession = manager.get(actor);
@@ -38,9 +38,30 @@ public class SpigotCommand implements CommandExecutor {
 
         try {
             SchematicWriter.save(region, "test.schem");
+            player.sendMessage(ChatColor.GREEN + "Schematic successfully saved.");
         } catch (WorldEditException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void recordCommand(@NotNull Player player) {
+        var recordingManager = MCWeb.getInstance().getRecordingManager();
+
+        if(recordingManager.stopRecording(player)) {
+            player.sendMessage(ChatColor.BLUE + "Recording stopped.");
+            return;
+        }
+
+        Region region;
+        try {
+            region = getSelection(player);
+        } catch (IncompleteRegionException e) {
+            player.sendMessage(ChatColor.RED + "You must select a region first.");
+            return;
+        }
+
+        recordingManager.startRecording(player, region);
+        player.sendMessage(ChatColor.BLUE + "Recording started.");
     }
 
     @Override
@@ -52,12 +73,15 @@ public class SpigotCommand implements CommandExecutor {
 
         if(args.length == 0) return false;
 
-        if ("schem".equals(args[0])) {
-            schemCommand((Player) sender);
-            sender.sendMessage(ChatColor.GREEN + "Schematic successfully saved.");
-            return true;
-        }else {
-            return false;
+        switch (args[0]) {
+            case "schem":
+                schemCommand((Player) sender);
+                return true;
+            case "record":
+                recordCommand((Player) sender);
+                return true;
+            default:
+                return false;
         }
     }
 }

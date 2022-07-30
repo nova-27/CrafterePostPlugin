@@ -16,6 +16,11 @@ import java.io.*;
 import java.util.Objects;
 
 public class SchematicWriter {
+    /**
+     * Schematicファイルとして書き出す
+     * @param region 書き出す地域
+     * @param fileName 書き出すファイル名
+     */
     public static void save(@NotNull Region region, @NotNull String fileName) throws WorldEditException, IOException {
         File file = new File(MCWeb.getInstance().getDataFolder(), fileName);
 
