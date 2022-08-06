@@ -99,13 +99,14 @@ public class RecordingWriter {
         if(event instanceof BlockPlaceEvent) {
             var block = ((BlockPlaceEvent) event).getBlock();
             if(!isInRegion(block.getLocation())) return;
+            var minPos = region.getMinimumPoint();
 
             var blockData = WrappedBlockData.createData(block.getBlockData()).getHandle();
             eventData.put("BlockId", new IntTag(getBlockStateId(blockData)));
             var pos = new ListTag<>(IntTag.class);
-            pos.addInt(block.getX());
-            pos.addInt(block.getY());
-            pos.addInt(block.getZ());
+            pos.addInt(block.getX() - minPos.getX());
+            pos.addInt(block.getY() - minPos.getY());
+            pos.addInt(block.getZ() - minPos.getZ());
             eventData.put("Pos", pos);
             tickData.blockPlace.add(eventData);
         }else{
