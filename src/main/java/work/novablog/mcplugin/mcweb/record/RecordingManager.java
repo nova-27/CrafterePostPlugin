@@ -85,12 +85,11 @@ public class RecordingManager extends BukkitRunnable implements Listener {
 
     @Override
     public void run() {
+        elapsedTicks++;
         var receivedEvents = bukkitEventListener.getReceivedEvents();
-        if(receivedEvents.size() == 0) return;
         for (var recording : recordings.values()) {
             recording.saveEvents(receivedEvents, elapsedTicks);
         }
         bukkitEventListener.clearReceivedEvents();
-        elapsedTicks++;
     }
 }

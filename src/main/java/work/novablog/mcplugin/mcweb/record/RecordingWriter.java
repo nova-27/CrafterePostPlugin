@@ -1,35 +1,63 @@
 package work.novablog.mcplugin.mcweb.record;
 
+import com.comphenix.protocol.wrappers.WrappedBlockData;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.io.*;
 import net.querz.nbt.tag.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Range;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.jetbrains.annotations.Nullable;
 import work.novablog.mcplugin.mcweb.MCWeb;
+import work.novablog.mcplugin.mcweb.SchematicWriter;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 public class RecordingWriter {
     private final Region region;
     private final CompoundTag data;
+    private final CompoundTag eventsData;
 
     public RecordingWriter(Region region) {
         this.region = region;
         data = new CompoundTag();
+        eventsData = new CompoundTag();
+
+        data.put("schem", getSchematicCompoundTag());
+    }
+
+    private @Nullable Tag<?> getSchematicCompoundTag() {
+        var outputStream = new ByteArrayOutputStream();
+        NamedTag schematicTag;
+        try {
+            SchematicWriter.write(region, outputStream);
+            var inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            schematicTag = new NBTDeserializer(true).fromStream(inputStream);
+        } catch (WorldEditException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return schematicTag.getTag();
     }
 
     /**
      * 録画ファイルを保存する
      */
     public void save() throws IOException {
-        File file = new File(MCWeb.getInstance().getDataFolder(), "test.mcrec");
-        NBTUtil.write(data, file);
+        data.put("events", eventsData);
+
+        File file = new File(MCWeb.getInstance().getDataFolder(), "test.mcsr");
+        try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file), true))) {
+            nbtOut.writeTag(new NamedTag(null, data), Tag.DEFAULT_MAX_DEPTH);
+        }
     }
 
     /**
@@ -40,9 +68,13 @@ public class RecordingWriter {
     public void saveEvents(List<Cancellable> events, long elapsedTicks) {
         var tickData = new TickData();
 
-        for (var event : events) {
-            writeEventToTickData(event, tickData);
-        }
+        events.forEach(event -> {
+            try {
+                writeEventToTickData(event, tickData);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         var tickDataCompoundTag = new CompoundTag();
         try {
@@ -56,17 +88,20 @@ public class RecordingWriter {
             e.printStackTrace();
         }
 
-        data.put(String.valueOf(elapsedTicks), tickDataCompoundTag);
+        if(tickDataCompoundTag.size() == 0) return;
+
+        eventsData.put(String.valueOf(elapsedTicks), tickDataCompoundTag);
     }
 
-    private void writeEventToTickData(Cancellable event, TickData tickData) {
+    private void writeEventToTickData(Cancellable event, TickData tickData) throws Exception {
         var eventData = new CompoundTag();
 
         if(event instanceof BlockPlaceEvent) {
             var block = ((BlockPlaceEvent) event).getBlock();
             if(!isInRegion(block.getLocation())) return;
 
-            eventData.put("BlockId", new StringTag(block.getBlockData().getAsString()));
+            var blockData = WrappedBlockData.createData(block.getBlockData()).getHandle();
+            eventData.put("BlockId", new IntTag(getBlockStateId(blockData)));
             var pos = new ListTag<>(IntTag.class);
             pos.addInt(block.getX());
             pos.addInt(block.getY());
@@ -78,6 +113,14 @@ public class RecordingWriter {
                     event.getClass().getName() +" handling method is not implemented."
             );
         }
+    }
+
+    private int getBlockStateId(Object blockData) throws Exception {
+        var netMinecraftBlockClass = Class.forName("net.minecraft.world.level.block.Block");
+        var netMinecraftIBlockDataClass = Class.forName("net.minecraft.world.level.block.state.IBlockData");
+        Method getStateIdMethod = netMinecraftBlockClass.getMethod("i", netMinecraftIBlockDataClass);
+
+        return (int) getStateIdMethod.invoke(null, blockData);
     }
 
     private static class TickData {
