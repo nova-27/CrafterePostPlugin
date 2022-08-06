@@ -16,6 +16,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class SpigotCommand implements CommandExecutor {
@@ -36,11 +38,13 @@ public class SpigotCommand implements CommandExecutor {
             return;
         }
 
-        try {
-            SchematicWriter.save(region, "test.schem");
+        var file = new File(MCWeb.getInstance().getDataFolder(), "test.schem");
+        try(var outputStream = new FileOutputStream(file)) {
+            SchematicWriter.write(region, outputStream);
             player.sendMessage(ChatColor.GREEN + "Schematic successfully saved.");
-        } catch (WorldEditException | IOException e) {
+        } catch (IOException | WorldEditException e) {
             e.printStackTrace();
+            player.sendMessage(ChatColor.RED + "Internal error has occurred.");
         }
     }
 

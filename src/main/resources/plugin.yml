@@ -3,7 +3,7 @@ version: 1.0
 main: work.novablog.mcplugin.mcweb.MCWeb
 api-version: 1.18
 authors: [nova27]
-depend: [WorldEdit]
+depend: [WorldEdit, ProtocolLib]
 commands:
   mcweb:
     description: mcweb
