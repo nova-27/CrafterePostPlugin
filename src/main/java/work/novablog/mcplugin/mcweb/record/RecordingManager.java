@@ -43,7 +43,7 @@ public class RecordingManager extends BukkitRunnable implements Listener {
     public boolean startRecording(@NotNull UUID uuid, @NotNull Region region) {
         if(isRecording(uuid)) return false;
 
-        var recording = new RecordingWriter(region);
+        var recording = new RecordingWriter(region, elapsedTicks);
         recordings.put(uuid, recording);
 
         return true;
