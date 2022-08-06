@@ -22,11 +22,13 @@ import java.util.zip.GZIPOutputStream;
 
 public class RecordingWriter {
     private final Region region;
+    private final long startTicks;
     private final CompoundTag data;
     private final CompoundTag eventsData;
 
-    public RecordingWriter(Region region) {
+    public RecordingWriter(Region region, long startTicks) {
         this.region = region;
+        this.startTicks = startTicks;
         data = new CompoundTag();
         eventsData = new CompoundTag();
 
@@ -90,7 +92,7 @@ public class RecordingWriter {
 
         if(tickDataCompoundTag.size() == 0) return;
 
-        eventsData.put(String.valueOf(elapsedTicks), tickDataCompoundTag);
+        eventsData.put(String.valueOf(elapsedTicks - startTicks), tickDataCompoundTag);
     }
 
     private void writeEventToTickData(Cancellable event, TickData tickData) throws Exception {
