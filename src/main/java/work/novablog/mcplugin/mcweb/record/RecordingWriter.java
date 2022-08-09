@@ -2,14 +2,15 @@ package work.novablog.mcplugin.mcweb.record;
 
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import net.querz.nbt.io.*;
 import net.querz.nbt.tag.*;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.Range;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.jetbrains.annotations.Nullable;
 import work.novablog.mcplugin.mcweb.MCWeb;
@@ -100,17 +101,23 @@ public class RecordingWriter {
 
         if(event instanceof BlockPlaceEvent) {
             var block = ((BlockPlaceEvent) event).getBlock();
-            if(!isInRegion(block.getLocation())) return;
+            if (!isInRegion(block.getLocation())) return;
             var minPos = region.getMinimumPoint();
+            var pos = block.getLocation().subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
 
             var blockData = WrappedBlockData.createData(block.getBlockData()).getHandle();
             eventData.put("BlockId", new IntTag(getBlockStateId(blockData)));
-            var pos = new ListTag<>(IntTag.class);
-            pos.addInt(block.getX() - minPos.getX());
-            pos.addInt(block.getY() - minPos.getY());
-            pos.addInt(block.getZ() - minPos.getZ());
-            eventData.put("Pos", pos);
-            tickData.blockPlace.add(eventData);
+            eventData.put("Pos", locToListTag(pos));
+            tickData.block.add(eventData);
+        }else if(event instanceof BlockBreakEvent){
+            var block = ((BlockBreakEvent) event).getBlock();
+            if (!isInRegion(block.getLocation())) return;
+            var minPos = region.getMinimumPoint();
+            var pos = block.getLocation().subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
+
+            eventData.put("BlockId", new IntTag(0));
+            eventData.put("Pos", locToListTag(pos));
+            tickData.block.add(eventData);
         }else{
             MCWeb.getInstance().getLogger().info(
                     event.getClass().getName() +" handling method is not implemented."
@@ -126,8 +133,16 @@ public class RecordingWriter {
         return (int) getStateIdMethod.invoke(null, blockData);
     }
 
+    private ListTag<DoubleTag> locToListTag(Location loc) {
+        var tag = new ListTag<>(DoubleTag.class);
+        tag.addDouble(loc.getX());
+        tag.addDouble(loc.getY());
+        tag.addDouble(loc.getZ());
+        return tag;
+    }
+
     private static class TickData {
-        public final ListTag<CompoundTag> blockPlace = new ListTag<>(CompoundTag.class);
+        public final ListTag<CompoundTag> block = new ListTag<>(CompoundTag.class);
     }
 
     /**
@@ -136,10 +151,7 @@ public class RecordingWriter {
      * @return 範囲内ならtrue
      */
     private boolean isInRegion(Location loc) {
-        BlockVector3 minLoc = region.getMinimumPoint();
-        BlockVector3 maxLoc = region.getMaximumPoint();
-        return Range.between(minLoc.getBlockX(), maxLoc.getBlockX()).contains(loc.getBlockX()) &&
-                Range.between(minLoc.getBlockY(), maxLoc.getBlockY()).contains(loc.getBlockY()) &&
-                Range.between(minLoc.getBlockZ(), maxLoc.getBlockZ()).contains(loc.getBlockZ());
+        var locWorld = new BukkitWorld(loc.getWorld());
+        return locWorld.equals(region.getWorld()) && region.contains(BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 }
