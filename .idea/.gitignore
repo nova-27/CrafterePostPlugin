@@ -1,0 +1,6 @@
+**/workspace.xml
+**/gradle.xml
+compiler.xml
+jarRepositories.xml
+*.iml
+uiDesigner.xml
