@@ -1,24 +1,17 @@
 package work.novablog.mcplugin.mcweb.record;
 
-import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import net.querz.nbt.io.*;
 import net.querz.nbt.tag.*;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.jetbrains.annotations.Nullable;
 import work.novablog.mcplugin.mcweb.MCWeb;
 import work.novablog.mcplugin.mcweb.SchematicWriter;
 
 import java.io.*;
-import java.lang.reflect.Method;
-import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 public class RecordingWriter {
@@ -63,74 +56,22 @@ public class RecordingWriter {
         }
     }
 
-    /**
-     * イベントに関するデータを変数に保存する
-     * @param events 書き込むイベント
-     * @param elapsedTicks 経過したティック数
-     */
-    public void saveEvents(List<Cancellable> events, long elapsedTicks) {
+    public void saveBukkitEvents(BukkitEventListener listener, long elapsedTicks) {
         var tickData = new TickData();
+        tickData.saveEvents("BlockChange", listener.getBlockChanges(), (loc, stateId) -> {
+            if (!isInRegion(loc)) return null;
+            var minPos = region.getMinimumPoint();
+            var pos = loc.subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
 
-        events.forEach(event -> {
-            try {
-                writeEventToTickData(event, tickData);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            var data = new CompoundTag();
+            data.put("BlockId", new IntTag(stateId));
+            data.put("Pos", locToListTag(pos));
+            return data;
         });
 
-        var tickDataCompoundTag = new CompoundTag();
-        try {
-            for (var field : tickData.getClass().getFields()) {
-                var fieldName = StringUtils.capitalize(field.getName());
-                var fieldData = (ListTag<?>) field.get(tickData);
-                if(fieldData.size() == 0) continue;
-                tickDataCompoundTag.put(fieldName, fieldData);
-            }
-        }catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        var tickDataCompoundTag = tickData.getCompoundTag();
         if(tickDataCompoundTag.size() == 0) return;
-
         eventsData.put(String.valueOf(elapsedTicks - startTicks), tickDataCompoundTag);
-    }
-
-    private void writeEventToTickData(Cancellable event, TickData tickData) throws Exception {
-        var eventData = new CompoundTag();
-
-        if(event instanceof BlockPlaceEvent) {
-            var block = ((BlockPlaceEvent) event).getBlock();
-            if (!isInRegion(block.getLocation())) return;
-            var minPos = region.getMinimumPoint();
-            var pos = block.getLocation().subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
-
-            var blockData = WrappedBlockData.createData(block.getBlockData()).getHandle();
-            eventData.put("BlockId", new IntTag(getBlockStateId(blockData)));
-            eventData.put("Pos", locToListTag(pos));
-            tickData.block.add(eventData);
-        }else if(event instanceof BlockBreakEvent){
-            var block = ((BlockBreakEvent) event).getBlock();
-            if (!isInRegion(block.getLocation())) return;
-            var minPos = region.getMinimumPoint();
-            var pos = block.getLocation().subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
-
-            eventData.put("BlockId", new IntTag(0));
-            eventData.put("Pos", locToListTag(pos));
-            tickData.block.add(eventData);
-        }else{
-            MCWeb.getInstance().getLogger().info(
-                    event.getClass().getName() +" handling method is not implemented."
-            );
-        }
-    }
-
-    private int getBlockStateId(Object blockData) throws Exception {
-        var netMinecraftBlockClass = Class.forName("net.minecraft.world.level.block.Block");
-        var netMinecraftIBlockDataClass = Class.forName("net.minecraft.world.level.block.state.IBlockData");
-        Method getStateIdMethod = netMinecraftBlockClass.getMethod("i", netMinecraftIBlockDataClass);
-
-        return (int) getStateIdMethod.invoke(null, blockData);
     }
 
     private ListTag<DoubleTag> locToListTag(Location loc) {
@@ -139,10 +80,6 @@ public class RecordingWriter {
         tag.addDouble(loc.getY());
         tag.addDouble(loc.getZ());
         return tag;
-    }
-
-    private static class TickData {
-        public final ListTag<CompoundTag> block = new ListTag<>(CompoundTag.class);
     }
 
     /**
