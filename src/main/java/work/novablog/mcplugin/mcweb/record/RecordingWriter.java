@@ -56,7 +56,7 @@ public class RecordingWriter {
         }
     }
 
-    public void saveBukkitEvents(BukkitEventListener listener, long elapsedTicks) {
+    public void saveBukkitEvents(ServerEventListener listener, long elapsedTicks) {
         var tickData = new TickData();
         tickData.saveEvents("BlockChange", listener.getBlockChanges(), (loc, stateId) -> {
             if (!isInRegion(loc)) return null;

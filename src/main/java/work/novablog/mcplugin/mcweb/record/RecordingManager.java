@@ -14,15 +14,14 @@ import java.util.*;
 
 public class RecordingManager extends BukkitRunnable implements Listener {
     private final Map<UUID, RecordingWriter> recordings;
-    private final BukkitEventListener bukkitEventListener;
+    private final ServerEventListener serverEventListener;
     private long elapsedTicks;
 
     public RecordingManager() {
         recordings = new HashMap<>();
-        bukkitEventListener = new BukkitEventListener();
+        serverEventListener = new ServerEventListener();
         elapsedTicks = 0;
         Bukkit.getServer().getPluginManager().registerEvents(this, MCWeb.getInstance());
-        Bukkit.getServer().getPluginManager().registerEvents(bukkitEventListener, MCWeb.getInstance());
     }
 
     /**
@@ -88,8 +87,8 @@ public class RecordingManager extends BukkitRunnable implements Listener {
         elapsedTicks++;
 
         for (var recording : recordings.values()) {
-            recording.saveBukkitEvents(bukkitEventListener, elapsedTicks);
+            recording.saveBukkitEvents(serverEventListener, elapsedTicks);
         }
-        bukkitEventListener.clear();
+        serverEventListener.clear();
     }
 }
