@@ -1,9 +1,9 @@
-package work.novablog.mcplugin.mcweb;
+package com.github.nova_27.mcplugin.mcweb;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import work.novablog.mcplugin.mcweb.record.RecordingManager;
+import com.github.nova_27.mcplugin.mcweb.record.RecordingManager;
 
 import java.util.Objects;
 import java.util.logging.Level;

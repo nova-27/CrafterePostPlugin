@@ -1,4 +1,4 @@
-package work.novablog.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.mcweb.record;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -8,8 +8,8 @@ import net.querz.nbt.io.*;
 import net.querz.nbt.tag.*;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-import work.novablog.mcplugin.mcweb.MCWeb;
-import work.novablog.mcplugin.mcweb.SchematicWriter;
+import com.github.nova_27.mcplugin.mcweb.MCWeb;
+import com.github.nova_27.mcplugin.mcweb.SchematicWriter;
 
 import java.io.*;
 import java.util.zip.GZIPOutputStream;

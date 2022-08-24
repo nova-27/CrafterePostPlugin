@@ -1,4 +1,4 @@
-package work.novablog.mcplugin.mcweb;
+package com.github.nova_27.mcplugin.mcweb;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;

@@ -1,5 +1,6 @@
-package work.novablog.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.mcweb.record;
 
+import com.github.nova_27.mcplugin.mcweb.MCWeb;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -7,7 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import work.novablog.mcplugin.mcweb.MCWeb;
 
 import java.io.IOException;
 import java.util.*;

@@ -1,4 +1,4 @@
-package work.novablog.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.mcweb.record;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -10,7 +10,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import org.bukkit.Location;
 import org.bukkit.World;
-import work.novablog.mcplugin.mcweb.MCWeb;
+import com.github.nova_27.mcplugin.mcweb.MCWeb;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

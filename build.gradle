@@ -1,10 +1,12 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.palantir.git-version' version '0.15.0'
+    id 'net.minecrell.plugin-yml.bukkit' version '0.5.2'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'com.github.nova_27.mcplugin'
+version versionDetails().lastTag.substring(1)
 
 repositories {
     mavenCentral()
@@ -21,4 +23,27 @@ dependencies {
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.9'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     implementation 'com.github.Querz:NBT:6.1'
+}
+
+shadowJar {
+    if(project.hasProperty('outputDir'))
+        getDestinationDirectory().set(new File(outputDir))
+}
+
+bukkit {
+    name = rootProject.name
+    version = project.version
+    main = "${project.group}.${rootProject.name.toLowerCase()}"
+    description = 'description'
+    website = 'https://example.com'
+    apiVersion = '1.18'
+    authors = ['nova27']
+    depend = ['WorldEdit', 'ProtocolLib']
+
+    commands {
+        mcweb {
+            description = 'mcweb'
+            usage = 'test!'
+        }
+    }
 }
