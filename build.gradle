@@ -33,16 +33,16 @@ shadowJar {
 bukkit {
     name = rootProject.name
     version = project.version
-    main = "${project.group}.${rootProject.name.toLowerCase()}"
+    main = "${project.group}.${rootProject.name.toLowerCase()}.${rootProject.name}"
     description = 'description'
     website = 'https://example.com'
     apiVersion = '1.18'
-    authors = ['nova27']
+    author = 'nova27'
     depend = ['WorldEdit', 'ProtocolLib']
 
     commands {
         mcweb {
-            description = 'mcweb'
+            description = 'Export the selected area in the Sponge Schematic Format.'
             usage = 'test!'
         }
     }
