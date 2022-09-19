@@ -1,4 +1,4 @@
-package com.github.nova_27.mcplugin.mcweb;
+package com.github.nova_27.mcplugin.crafterepost;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -38,7 +38,7 @@ public class SpigotCommand implements CommandExecutor {
             return;
         }
 
-        var file = new File(MCWeb.getInstance().getDataFolder(), "test.schem");
+        var file = new File(CrafterePost.getInstance().getDataFolder(), "test.schem");
         try(var outputStream = new FileOutputStream(file)) {
             SchematicWriter.write(region, outputStream);
             player.sendMessage(ChatColor.GREEN + "Schematic successfully saved.");
@@ -49,7 +49,7 @@ public class SpigotCommand implements CommandExecutor {
     }
 
     private void recordCommand(@NotNull Player player) {
-        var recordingManager = MCWeb.getInstance().getRecordingManager();
+        var recordingManager = CrafterePost.getInstance().getRecordingManager();
         var uuid = player.getUniqueId();
 
         if(recordingManager.stopRecording(uuid)) {

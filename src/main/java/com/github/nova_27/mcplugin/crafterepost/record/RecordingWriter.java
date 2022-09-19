@@ -1,4 +1,4 @@
-package com.github.nova_27.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.crafterepost.record;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -8,8 +8,8 @@ import net.querz.nbt.io.*;
 import net.querz.nbt.tag.*;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-import com.github.nova_27.mcplugin.mcweb.MCWeb;
-import com.github.nova_27.mcplugin.mcweb.SchematicWriter;
+import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
+import com.github.nova_27.mcplugin.crafterepost.SchematicWriter;
 
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
@@ -50,7 +50,7 @@ public class RecordingWriter {
     public void save() throws IOException {
         data.put("events", eventsData);
 
-        File file = new File(MCWeb.getInstance().getDataFolder(), "test.mcsr");
+        File file = new File(CrafterePost.getInstance().getDataFolder(), "test.mcsr");
         try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file), true))) {
             nbtOut.writeTag(new NamedTag(null, data), Tag.DEFAULT_MAX_DEPTH);
         }

@@ -1,4 +1,4 @@
-package com.github.nova_27.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.crafterepost.record;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -10,7 +10,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import org.bukkit.Location;
 import org.bukkit.World;
-import com.github.nova_27.mcplugin.mcweb.MCWeb;
+import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class ServerEventListener {
     public ServerEventListener() {
         blockChanges = new HashMap<>();
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(
-                MCWeb.getInstance(),
+                CrafterePost.getInstance(),
                 ListenerPriority.NORMAL,
                 PacketType.Play.Server.BLOCK_CHANGE,
                 PacketType.Play.Server.MULTI_BLOCK_CHANGE

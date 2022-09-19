@@ -41,7 +41,7 @@ bukkit {
     depend = ['WorldEdit', 'ProtocolLib']
 
     commands {
-        mcweb {
+        crapos {
             description = 'Export the selected area in the Sponge Schematic Format.'
             usage = 'test!'
         }

@@ -1,4 +1,4 @@
-package com.github.nova_27.mcplugin.mcweb;
+package com.github.nova_27.mcplugin.crafterepost;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;

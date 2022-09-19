@@ -1,6 +1,6 @@
-package com.github.nova_27.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.crafterepost.record;
 
-import com.github.nova_27.mcplugin.mcweb.MCWeb;
+import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -21,7 +21,7 @@ public class RecordingManager extends BukkitRunnable implements Listener {
         recordings = new HashMap<>();
         serverEventListener = new ServerEventListener();
         elapsedTicks = 0;
-        Bukkit.getServer().getPluginManager().registerEvents(this, MCWeb.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(this, CrafterePost.getInstance());
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.github.nova_27.mcplugin.mcweb.record;
+package com.github.nova_27.mcplugin.crafterepost.record;
 
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
