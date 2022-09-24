@@ -1,7 +1,7 @@
 package com.github.nova_27.mcplugin.crafterepost.record;
 
 import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
-import com.github.nova_27.mcplugin.crafterepost.SchematicWriter;
+import com.github.nova_27.mcplugin.crafterepost.Utils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -35,7 +35,7 @@ public class RecordingWriter {
         var outputStream = new ByteArrayOutputStream();
         NamedTag schematicTag;
         try {
-            SchematicWriter.write(region, outputStream);
+            Utils.writeSchematic(region, outputStream);
             var inputStream = new ByteArrayInputStream(outputStream.toByteArray());
             schematicTag = new NBTDeserializer(true).fromStream(inputStream);
         } catch (WorldEditException | IOException e) {

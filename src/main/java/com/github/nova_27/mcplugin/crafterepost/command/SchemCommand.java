@@ -1,7 +1,6 @@
 package com.github.nova_27.mcplugin.crafterepost.command;
 
 import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
-import com.github.nova_27.mcplugin.crafterepost.SchematicWriter;
 import com.github.nova_27.mcplugin.crafterepost.Utils;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEditException;
@@ -44,7 +43,7 @@ public class SchemCommand extends BaseCommand {
 
         var file = new File(CrafterePost.getInstance().getDataFolder(), "test.schem");
         try (var outputStream = new FileOutputStream(file)) {
-            SchematicWriter.write(region, outputStream);
+            Utils.writeSchematic(region, outputStream);
             player.sendMessage(ChatColor.GREEN + "Schematic建築ファイルを保存しました");
         } catch (IOException | WorldEditException e) {
             e.printStackTrace();
