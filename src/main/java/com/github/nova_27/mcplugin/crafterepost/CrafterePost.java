@@ -1,5 +1,8 @@
 package com.github.nova_27.mcplugin.crafterepost;
 
+import com.github.nova_27.mcplugin.crafterepost.command.CommandManager;
+import com.github.nova_27.mcplugin.crafterepost.command.RecordCommand;
+import com.github.nova_27.mcplugin.crafterepost.command.SchemCommand;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +27,7 @@ public class CrafterePost extends JavaPlugin {
     public void onEnable() {
         instance = this;
         recordingManager = new RecordingManager();
+        recordingManager.runTaskTimer(CrafterePost.getInstance(), 0L, 1L);
 
         if(!getDataFolder().isDirectory() && !getDataFolder().mkdirs()) {
             getLogger().log(Level.SEVERE, "Failed to create the plugin directory!");
@@ -35,8 +39,10 @@ public class CrafterePost extends JavaPlugin {
             return;
         }
 
-        recordingManager.runTaskTimer(CrafterePost.getInstance(), 0L, 1L);
-        Objects.requireNonNull(getCommand("crapos")).setExecutor(new SpigotCommand());
+        var commandManager = new CommandManager();
+        commandManager.register(new SchemCommand());
+        commandManager.register(new RecordCommand());
+        Objects.requireNonNull(getCommand("crapos")).setExecutor(commandManager);
     }
 
     @Override

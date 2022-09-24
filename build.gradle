@@ -34,16 +34,17 @@ bukkit {
     name = rootProject.name
     version = project.version
     main = "${project.group}.${rootProject.name.toLowerCase()}.${rootProject.name}"
-    description = 'description'
-    website = 'https://example.com'
+    description = 'CrafterePost公式プラグイン'
+    website = 'https://crafterepost.netlify.app/'
     apiVersion = '1.18'
     author = 'nova27'
     depend = ['WorldEdit', 'ProtocolLib']
 
     commands {
         crapos {
-            description = 'Export the selected area in the Sponge Schematic Format.'
-            usage = 'test!'
+            description = 'Schematic建築ファイル / MCSR録画ファイル を出力します'
+            usage = 'usage: /<command> <schem|record>'
+            aliases = ['crafterepost']
         }
     }
 }
