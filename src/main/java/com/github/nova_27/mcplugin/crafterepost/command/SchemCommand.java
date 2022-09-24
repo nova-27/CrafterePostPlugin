@@ -27,7 +27,7 @@ public class SchemCommand extends BaseCommand {
     }
 
     @Override
-    public void onCommand(CommandSender sender, String[] args) {
+    public void onCommand(CommandSender sender, String label, String[] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "このコマンドはプレイヤーのみ実行可能です！");
             return;

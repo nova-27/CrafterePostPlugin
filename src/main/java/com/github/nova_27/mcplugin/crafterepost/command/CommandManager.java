@@ -35,7 +35,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        subCommand.onCommand(sender, subCommandArgs);
+        subCommand.onCommand(sender, label, subCommandArgs);
         return true;
     }
 

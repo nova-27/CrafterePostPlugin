@@ -11,7 +11,7 @@ public abstract class BaseCommand {
 
     public abstract boolean checkPermission(Player player);
 
-    public abstract void onCommand(CommandSender sender, String[] args);
+    public abstract void onCommand(CommandSender sender, String label, String[] args);
 
     public abstract @Nullable List<String> onTabComplete(CommandSender sender, String[] args);
 }

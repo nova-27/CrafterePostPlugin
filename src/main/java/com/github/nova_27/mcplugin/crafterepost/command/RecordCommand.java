@@ -9,9 +9,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecordCommand extends BaseCommand {
+    private static final List<String> commands = new ArrayList<>() {
+        {
+            add("start");
+            add("stop");
+        }
+    };
 
     @Override
     public String getName() {
@@ -24,7 +31,7 @@ public class RecordCommand extends BaseCommand {
     }
 
     @Override
-    public void onCommand(CommandSender sender, String[] args) {
+    public void onCommand(CommandSender sender, String label, String[] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "このコマンドはプレイヤーのみ実行可能です！");
             return;
@@ -33,25 +40,38 @@ public class RecordCommand extends BaseCommand {
         var recordingManager = CrafterePost.getInstance().getRecordingManager();
         var uuid = player.getUniqueId();
 
-        if (recordingManager.stopRecording(uuid)) {
-            player.sendMessage(ChatColor.BLUE + "録画停止");
-            return;
-        }
+        switch (args[0]) {
+            case "start":
+                Region region;
+                try {
+                    region = Utils.getSelection(player);
+                } catch (IncompleteRegionException e) {
+                    player.sendMessage(ChatColor.RED + "wandで保存範囲を選択してください！");
+                    return;
+                }
 
-        Region region;
-        try {
-            region = Utils.getSelection(player);
-        } catch (IncompleteRegionException e) {
-            player.sendMessage(ChatColor.RED + "wandで保存範囲を選択してください！");
-            return;
+                if (recordingManager.startRecording(uuid, region)) {
+                    player.sendMessage(ChatColor.BLUE + "録画を開始しました");
+                } else {
+                    player.sendMessage(ChatColor.RED + "録画は既に開始されています！");
+                }
+                break;
+            case "stop":
+                if (recordingManager.stopRecording(uuid)) {
+                    player.sendMessage(ChatColor.BLUE + "録画を停止しました");
+                } else {
+                    player.sendMessage(ChatColor.RED + "録画は開始していません！");
+                }
+                break;
+            default:
+                player.sendMessage("usage: /<command> record <start|stop>".replace("<command>", label));
+                break;
         }
-
-        recordingManager.startRecording(uuid, region);
-        player.sendMessage(ChatColor.BLUE + "録画開始");
     }
 
     @Override
     public @Nullable List<String> onTabComplete(CommandSender sender, String[] args) {
-        return null;
+        if (!(sender instanceof Player) || args.length > 1) return null;
+        return commands.stream().filter(cmd -> cmd.startsWith(args[0])).toList();
     }
 }
