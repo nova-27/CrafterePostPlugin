@@ -25,7 +25,7 @@ public class RecordCommand extends BaseCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if(!(sender instanceof Player player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "このコマンドはプレイヤーのみ実行可能です！");
             return;
         }
@@ -33,7 +33,7 @@ public class RecordCommand extends BaseCommand {
         var recordingManager = CrafterePost.getInstance().getRecordingManager();
         var uuid = player.getUniqueId();
 
-        if(recordingManager.stopRecording(uuid)) {
+        if (recordingManager.stopRecording(uuid)) {
             player.sendMessage(ChatColor.BLUE + "録画停止");
             return;
         }

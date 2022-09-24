@@ -29,7 +29,7 @@ public class SchemCommand extends BaseCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if(!(sender instanceof Player player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "このコマンドはプレイヤーのみ実行可能です！");
             return;
         }
@@ -43,7 +43,7 @@ public class SchemCommand extends BaseCommand {
         }
 
         var file = new File(CrafterePost.getInstance().getDataFolder(), "test.schem");
-        try(var outputStream = new FileOutputStream(file)) {
+        try (var outputStream = new FileOutputStream(file)) {
             SchematicWriter.write(region, outputStream);
             player.sendMessage(ChatColor.GREEN + "Schematic建築ファイルを保存しました");
         } catch (IOException | WorldEditException e) {

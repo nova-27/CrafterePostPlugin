@@ -9,13 +9,15 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.Region;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Objects;
 
 public class SchematicWriter {
     /**
      * OutputStreamにSchematicを書き出す
-     * @param region 書き出す地域
+     *
+     * @param region       書き出す地域
      * @param outputStream 書き出し先
      */
     public static void write(@NotNull Region region, @NotNull OutputStream outputStream) throws WorldEditException, IOException {
@@ -26,7 +28,7 @@ public class SchematicWriter {
         forwardExtentCopy.setCopyingEntities(true);
         Operations.complete(forwardExtentCopy);
 
-        try (ClipboardWriter clipboardWriter = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(outputStream)){
+        try (ClipboardWriter clipboardWriter = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(outputStream)) {
             clipboardWriter.write(clipboard);
         }
     }

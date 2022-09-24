@@ -1,15 +1,17 @@
 package com.github.nova_27.mcplugin.crafterepost.record;
 
+import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
+import com.github.nova_27.mcplugin.crafterepost.SchematicWriter;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import net.querz.nbt.io.*;
+import net.querz.nbt.io.NBTDeserializer;
+import net.querz.nbt.io.NBTOutputStream;
+import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.*;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
-import com.github.nova_27.mcplugin.crafterepost.SchematicWriter;
 
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
@@ -70,7 +72,7 @@ public class RecordingWriter {
         });
 
         var tickDataCompoundTag = tickData.getCompoundTag();
-        if(tickDataCompoundTag.size() == 0) return;
+        if (tickDataCompoundTag.size() == 0) return;
         eventsData.put(String.valueOf(elapsedTicks - startTicks), tickDataCompoundTag);
     }
 
@@ -84,6 +86,7 @@ public class RecordingWriter {
 
     /**
      * 座標がRegion範囲内かどうか
+     *
      * @param loc 座標
      * @return 範囲内ならtrue
      */
