@@ -6,10 +6,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
     private final Map<String, BaseCommand> commands;
@@ -42,7 +39,20 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        return null;
+        List<BaseCommand> subCommandSuggestions = new ArrayList<>();
+        for(var registeredCommand : commands.values()) {
+            if(!registeredCommand.getName().startsWith(args[0])) continue;
+            if(sender instanceof Player player && !registeredCommand.checkPermission(player)) continue;
+            subCommandSuggestions.add(registeredCommand);
+        }
+
+        if(args.length == 1) return subCommandSuggestions.stream().map(BaseCommand::getName).toList();
+        var subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
+
+        List<String> argumentsSuggestions = new ArrayList<>();
+        subCommandSuggestions.stream().map(cmd -> cmd.onTabComplete(sender, subCommandArgs)).filter(Objects::nonNull).forEach(argumentsSuggestions::addAll);
+
+        return argumentsSuggestions;
     }
 
     public void register(BaseCommand command) {
