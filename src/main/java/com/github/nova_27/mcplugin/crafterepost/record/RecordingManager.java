@@ -9,8 +9,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class RecordingManager extends BukkitRunnable implements Listener {
     private final Map<UUID, RecordingWriter> recordings;
@@ -26,6 +29,7 @@ public class RecordingManager extends BukkitRunnable implements Listener {
 
     /**
      * プレイヤーが録画中かどうか
+     *
      * @param uuid プレイヤーのUUID
      * @return 録画中ならtrue
      */
@@ -35,14 +39,16 @@ public class RecordingManager extends BukkitRunnable implements Listener {
 
     /**
      * 録画を開始する
-     * @param uuid プレイヤーのUUID
-     * @param region 録画地域
+     *
+     * @param uuid       プレイヤーのUUID
+     * @param region     録画地域
+     * @param outputFile 出力先
      * @return 録画中であればfalse
      */
-    public boolean startRecording(@NotNull UUID uuid, @NotNull Region region) {
-        if(isRecording(uuid)) return false;
+    public boolean startRecording(@NotNull UUID uuid, @NotNull Region region, File outputFile) {
+        if (isRecording(uuid)) return false;
 
-        var recording = new RecordingWriter(region, elapsedTicks);
+        var recording = new RecordingWriter(region, elapsedTicks, outputFile);
         recordings.put(uuid, recording);
 
         return true;
@@ -50,11 +56,12 @@ public class RecordingManager extends BukkitRunnable implements Listener {
 
     /**
      * 録画を終了する
+     *
      * @param uuid プレイヤーのUUID
      * @return 録画開始していなければfalse
      */
     public boolean stopRecording(@NotNull UUID uuid) {
-        if(!isRecording(uuid)) return false;
+        if (!isRecording(uuid)) return false;
 
         RecordingWriter recording = recordings.get(uuid);
         recordings.remove(uuid);
@@ -72,7 +79,7 @@ public class RecordingManager extends BukkitRunnable implements Listener {
      */
     public void stopRecordingTask() {
         cancel();
-        for(var playerUuid : recordings.keySet()) {
+        for (var playerUuid : recordings.keySet()) {
             stopRecording(playerUuid);
         }
     }

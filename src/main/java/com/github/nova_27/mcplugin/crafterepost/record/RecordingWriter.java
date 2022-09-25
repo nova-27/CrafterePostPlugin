@@ -1,15 +1,16 @@
 package com.github.nova_27.mcplugin.crafterepost.record;
 
+import com.github.nova_27.mcplugin.crafterepost.Utils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import net.querz.nbt.io.*;
+import net.querz.nbt.io.NBTDeserializer;
+import net.querz.nbt.io.NBTOutputStream;
+import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.*;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
-import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
-import com.github.nova_27.mcplugin.crafterepost.SchematicWriter;
 
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
@@ -17,12 +18,14 @@ import java.util.zip.GZIPOutputStream;
 public class RecordingWriter {
     private final Region region;
     private final long startTicks;
+    private final File outputFile;
     private final CompoundTag data;
     private final CompoundTag eventsData;
 
-    public RecordingWriter(Region region, long startTicks) {
+    public RecordingWriter(Region region, long startTicks, File outputFile) {
         this.region = region;
         this.startTicks = startTicks;
+        this.outputFile = outputFile;
         data = new CompoundTag();
         eventsData = new CompoundTag();
 
@@ -33,7 +36,7 @@ public class RecordingWriter {
         var outputStream = new ByteArrayOutputStream();
         NamedTag schematicTag;
         try {
-            SchematicWriter.write(region, outputStream);
+            Utils.writeSchematic(region, outputStream);
             var inputStream = new ByteArrayInputStream(outputStream.toByteArray());
             schematicTag = new NBTDeserializer(true).fromStream(inputStream);
         } catch (WorldEditException | IOException e) {
@@ -50,8 +53,7 @@ public class RecordingWriter {
     public void save() throws IOException {
         data.put("events", eventsData);
 
-        File file = new File(CrafterePost.getInstance().getDataFolder(), "test.mcsr");
-        try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file), true))) {
+        try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(outputFile), true))) {
             nbtOut.writeTag(new NamedTag(null, data), Tag.DEFAULT_MAX_DEPTH);
         }
     }
@@ -70,7 +72,7 @@ public class RecordingWriter {
         });
 
         var tickDataCompoundTag = tickData.getCompoundTag();
-        if(tickDataCompoundTag.size() == 0) return;
+        if (tickDataCompoundTag.size() == 0) return;
         eventsData.put(String.valueOf(elapsedTicks - startTicks), tickDataCompoundTag);
     }
 
@@ -84,6 +86,7 @@ public class RecordingWriter {
 
     /**
      * 座標がRegion範囲内かどうか
+     *
      * @param loc 座標
      * @return 範囲内ならtrue
      */

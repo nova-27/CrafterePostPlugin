@@ -8,9 +8,9 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
+import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
 import org.bukkit.Location;
 import org.bukkit.World;
-import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -31,11 +31,11 @@ public class ServerEventListener {
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
-                if(packet.getType() == PacketType.Play.Server.BLOCK_CHANGE) {
+                if (packet.getType() == PacketType.Play.Server.BLOCK_CHANGE) {
                     var loc = packet.getBlockPositionModifier().read(0).toLocation(event.getPlayer().getWorld());
                     var blockData = packet.getBlockData().read(0);
                     blockChanges.put(loc, getBlockStateId(blockData));
-                }else if(packet.getType() == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
+                } else if (packet.getType() == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
                     var sectionPos = packet.getSectionPositions().read(0);
                     var shortLocations = packet.getShortArrays().read(0);
                     var blockData = packet.getBlockDataArrays().read(0);
@@ -49,14 +49,6 @@ public class ServerEventListener {
                 }
             }
         });
-    }
-
-    public Map<Location, Integer> getBlockChanges() {
-        return blockChanges;
-    }
-
-    public void clear() {
-        blockChanges.clear();
     }
 
     private static int getBlockStateId(WrappedBlockData blockData) {
@@ -78,5 +70,13 @@ public class ServerEventListener {
         int z = (sectionPosition.getZ() * 16) + ((shortLoc >> 4) & 0xF);
         int x = (sectionPosition.getX() * 16) + ((shortLoc >> 8) & 0xF);
         return new Location(world, x, y, z);
+    }
+
+    public Map<Location, Integer> getBlockChanges() {
+        return blockChanges;
+    }
+
+    public void clear() {
+        blockChanges.clear();
     }
 }
