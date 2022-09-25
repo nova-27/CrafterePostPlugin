@@ -47,11 +47,21 @@ public class Utils {
         ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
                 Objects.requireNonNull(region.getWorld()), region, clipboard, region.getMinimumPoint()
         );
-        forwardExtentCopy.setCopyingEntities(true);
+        //forwardExtentCopy.setCopyingEntities(true);
         Operations.complete(forwardExtentCopy);
 
         try (ClipboardWriter clipboardWriter = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(outputStream)) {
             clipboardWriter.write(clipboard);
         }
+    }
+
+    /**
+     * 有効なファイル名かどうか
+     *
+     * @param fileName 検証するファイル名
+     * @return trueなら有効
+     */
+    public static boolean isValidFileName(String fileName) {
+        return !fileName.matches("^.*[\\\\|/|:|\\*|?|\"|<|>|\\|].*$");
     }
 }

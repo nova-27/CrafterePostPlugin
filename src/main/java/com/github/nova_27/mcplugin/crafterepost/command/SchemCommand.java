@@ -37,18 +37,56 @@ public class SchemCommand extends BaseCommand {
         try {
             region = Utils.getSelection(player);
         } catch (IncompleteRegionException e) {
-            player.sendMessage(ChatColor.RED + "wandで保存範囲を選択してください！");
+            player.sendMessage(ChatColor.RED + "wandで保存範囲を選択してください");
             return;
         }
 
-        var file = new File(CrafterePost.getInstance().getDataFolder(), "test.schem");
+        File file;
+        try {
+            file = createFileInstanceFromArgs(args);
+        } catch (IOException e) {
+            player.sendMessage(ChatColor.RED + e.getMessage());
+            return;
+        }
+
         try (var outputStream = new FileOutputStream(file)) {
             Utils.writeSchematic(region, outputStream);
             player.sendMessage(ChatColor.GREEN + "Schematic建築ファイルを保存しました");
         } catch (IOException | WorldEditException e) {
             e.printStackTrace();
-            player.sendMessage(ChatColor.RED + "内部エラーが発生しました！");
+            player.sendMessage(ChatColor.RED + "内部エラーが発生しました");
         }
+    }
+
+    private File createFileInstanceFromArgs(String[] args) throws IOException {
+        var doOverwrite = false;
+        var fileName = "";
+
+        for (var arg : args) {
+            if (arg.startsWith("-")) {
+                // フラグだったら
+                if (arg.equalsIgnoreCase("-f")) {
+                    doOverwrite = true;
+                } else {
+                    throw new IOException("無効なフラグ: " + arg);
+                }
+            } else {
+                //ファイル名なら
+                fileName = arg;
+            }
+        }
+
+        if (fileName.equals("")) throw new IOException("保存ファイル名を指定してください");
+
+        fileName += ".schem";
+        if (!Utils.isValidFileName(fileName)) throw new IOException("ファイル名に禁則文字が含まれています");
+
+        var file = new File(CrafterePost.getInstance().getDataFolder(), fileName);
+        if (!doOverwrite && file.exists()) throw new IOException("ファイルが存在します\n上書きするには -f フラグを使用してください");
+
+        if (!file.createNewFile() && !file.canWrite()) throw new IOException("ファイルを書き出すことができません");
+
+        return file;
     }
 
     @Override
