@@ -9,7 +9,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RecordCommand extends BaseCommand {
@@ -37,6 +40,8 @@ public class RecordCommand extends BaseCommand {
             return;
         }
 
+        if (args.length < 1) args = new String[]{""};
+
         var recordingManager = CrafterePost.getInstance().getRecordingManager();
         var uuid = player.getUniqueId();
 
@@ -50,7 +55,17 @@ public class RecordCommand extends BaseCommand {
                     return;
                 }
 
-                if (recordingManager.startRecording(uuid, region)) {
+                args = Arrays.copyOfRange(args, 1, args.length);
+
+                File file;
+                try {
+                    file = Utils.createFileInstanceFromArgs(args, "mcsr");
+                } catch (IOException e) {
+                    player.sendMessage(ChatColor.RED + e.getMessage());
+                    return;
+                }
+
+                if (recordingManager.startRecording(uuid, region, file)) {
                     player.sendMessage(ChatColor.BLUE + "録画を開始しました");
                 } else {
                     player.sendMessage(ChatColor.RED + "録画は既に開始されています！");
@@ -64,7 +79,7 @@ public class RecordCommand extends BaseCommand {
                 }
                 break;
             default:
-                player.sendMessage("usage: /<command> record <start|stop>".replace("<command>", label));
+                player.sendMessage("usage: /<command> record start [fileName] | /<command> record stop".replace("<command>", label));
                 break;
         }
     }

@@ -16,6 +16,7 @@ import com.sk89q.worldedit.session.SessionManager;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
@@ -63,5 +64,44 @@ public class Utils {
      */
     public static boolean isValidFileName(String fileName) {
         return !fileName.matches("^.*[\\\\|/|:|\\*|?|\"|<|>|\\|].*$");
+    }
+
+    /**
+     * コマンド引数からFileインスタンスを生成する
+     *
+     * @param args コマンド引数
+     * @param ext  拡張子
+     * @return 生成したFile
+     * @throws IOException エラーが発生したらメッセージ付きでthrow
+     */
+    public static File createFileInstanceFromArgs(String[] args, String ext) throws IOException {
+        var doOverwrite = false;
+        var fileName = "";
+
+        for (var arg : args) {
+            if (arg.startsWith("-")) {
+                // フラグだったら
+                if (arg.equalsIgnoreCase("-f")) {
+                    doOverwrite = true;
+                } else {
+                    throw new IOException("無効なフラグ: " + arg);
+                }
+            } else {
+                //ファイル名なら
+                fileName = arg;
+            }
+        }
+
+        if (fileName.equals("")) throw new IOException("保存ファイル名を指定してください");
+
+        fileName += "." + ext;
+        if (!isValidFileName(fileName)) throw new IOException("ファイル名に禁則文字が含まれています");
+
+        var file = new File(CrafterePost.getInstance().getDataFolder(), fileName);
+        if (!doOverwrite && file.exists()) throw new IOException("ファイルが存在します\n上書きするには -f フラグを使用してください");
+
+        if (!file.createNewFile() && !file.canWrite()) throw new IOException("ファイルを書き出すことができません");
+
+        return file;
     }
 }

@@ -1,6 +1,5 @@
 package com.github.nova_27.mcplugin.crafterepost.record;
 
-import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
 import com.github.nova_27.mcplugin.crafterepost.Utils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -19,12 +18,14 @@ import java.util.zip.GZIPOutputStream;
 public class RecordingWriter {
     private final Region region;
     private final long startTicks;
+    private final File outputFile;
     private final CompoundTag data;
     private final CompoundTag eventsData;
 
-    public RecordingWriter(Region region, long startTicks) {
+    public RecordingWriter(Region region, long startTicks, File outputFile) {
         this.region = region;
         this.startTicks = startTicks;
+        this.outputFile = outputFile;
         data = new CompoundTag();
         eventsData = new CompoundTag();
 
@@ -52,8 +53,7 @@ public class RecordingWriter {
     public void save() throws IOException {
         data.put("events", eventsData);
 
-        File file = new File(CrafterePost.getInstance().getDataFolder(), "test.mcsr");
-        try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file), true))) {
+        try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(outputFile), true))) {
             nbtOut.writeTag(new NamedTag(null, data), Tag.DEFAULT_MAX_DEPTH);
         }
     }
