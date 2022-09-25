@@ -9,18 +9,26 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-public class ServerEventListener {
+public class ServerEventListener implements Listener {
     private final Map<Location, Integer> blockChanges;
+    private final Map<UUID, Location> playerMove;
 
     public ServerEventListener() {
         blockChanges = new HashMap<>();
+        playerMove = new HashMap<>();
+        Bukkit.getServer().getPluginManager().registerEvents(this, CrafterePost.getInstance());
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(
                 CrafterePost.getInstance(),
                 ListenerPriority.NORMAL,
@@ -51,6 +59,11 @@ public class ServerEventListener {
         });
     }
 
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        playerMove.put(e.getPlayer().getUniqueId(), e.getTo());
+    }
+
     private static int getBlockStateId(WrappedBlockData blockData) {
         var id = 0;
         try {
@@ -72,11 +85,17 @@ public class ServerEventListener {
         return new Location(world, x, y, z);
     }
 
+
     public Map<Location, Integer> getBlockChanges() {
         return blockChanges;
     }
 
+    public Map<UUID, Location> getPlayerMove() {
+        return playerMove;
+    }
+
     public void clear() {
         blockChanges.clear();
+        playerMove.clear();
     }
 }

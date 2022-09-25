@@ -70,6 +70,13 @@ public class RecordingWriter {
             data.put("Pos", locToListTag(pos));
             return data;
         });
+        tickData.saveEvents("PlayerMove", listener.getPlayerMove(), (uuid, loc) -> {
+            var data = new CompoundTag();
+            data.put("Uuid", new StringTag(uuid.toString()));
+            data.put("Pos", locToListTag(loc));
+            data.put("Yaw", new FloatTag(loc.getYaw()));
+            return data;
+        });
 
         var tickDataCompoundTag = tickData.getCompoundTag();
         if (tickDataCompoundTag.size() == 0) return;
