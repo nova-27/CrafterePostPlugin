@@ -60,17 +60,20 @@ public class RecordingWriter {
 
     public void saveBukkitEvents(ServerEventListener listener, long elapsedTicks) {
         var tickData = new TickData();
-        tickData.saveEvents("BlockChange", listener.getBlockChanges(), (loc, stateId) -> {
-            if (!isInRegion(loc)) return null;
+        tickData.saveEvents("BlockChange", listener.getBlockChanges(), (worldLoc, stateId) -> {
+            if (!isInRegion(worldLoc)) return null;
             var minPos = region.getMinimumPoint();
-            var pos = loc.subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
+            var loc = worldLoc.subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
 
             var data = new CompoundTag();
             data.put("BlockId", new IntTag(stateId));
-            data.put("Pos", locToListTag(pos));
+            data.put("Pos", locToListTag(loc));
             return data;
         });
-        tickData.saveEvents("PlayerMove", listener.getPlayerMove(), (uuid, loc) -> {
+        tickData.saveEvents("PlayerMove", listener.getPlayerMove(), (uuid, worldLoc) -> {
+            var minPos = region.getMinimumPoint();
+            var loc = worldLoc.subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
+
             var data = new CompoundTag();
             data.put("Uuid", new StringTag(uuid.toString()));
             data.put("Pos", locToListTag(loc));
