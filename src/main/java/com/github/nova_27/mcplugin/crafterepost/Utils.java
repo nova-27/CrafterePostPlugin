@@ -13,6 +13,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionManager;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,6 +55,17 @@ public class Utils {
         try (ClipboardWriter clipboardWriter = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(outputStream)) {
             clipboardWriter.write(clipboard);
         }
+    }
+
+    /**
+     * BukkitBlockDataからブロック状態キーを取得する
+     *
+     * @param blockData BukkitBlockData
+     * @return ブロック状態キー
+     */
+    public static String getBlockKey(BlockData blockData) {
+        var blockState = BukkitAdapter.adapt(blockData);
+        return blockState.toBaseBlock().toImmutableState().getAsString();
     }
 
     /**

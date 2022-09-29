@@ -13,6 +13,8 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 public class RecordingWriter {
@@ -21,6 +23,8 @@ public class RecordingWriter {
     private final File outputFile;
     private final CompoundTag data;
     private final CompoundTag eventsData;
+    private final Map<String, Integer> blockPalette;
+    private int blockPaletteMax;
 
     public RecordingWriter(Region region, long startTicks, File outputFile) {
         this.region = region;
@@ -28,6 +32,8 @@ public class RecordingWriter {
         this.outputFile = outputFile;
         data = new CompoundTag();
         eventsData = new CompoundTag();
+        blockPalette = new HashMap<>();
+        blockPaletteMax = 0;
 
         data.put("schem", getSchematicCompoundTag());
     }
@@ -51,6 +57,10 @@ public class RecordingWriter {
      * 録画ファイルを保存する
      */
     public void save() throws IOException {
+        var blockPaletteTag = new CompoundTag();
+        blockPalette.forEach((blockKey, internalId) -> blockPaletteTag.put(blockKey, new IntTag(internalId)));
+        eventsData.put("blockPalette", blockPaletteTag);
+        eventsData.put("blockPaletteMax", new IntTag(blockPaletteMax));
         data.put("events", eventsData);
 
         try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(outputFile), true))) {
@@ -60,13 +70,13 @@ public class RecordingWriter {
 
     public void saveBukkitEvents(ServerEventListener listener, long elapsedTicks) {
         var tickData = new TickData();
-        tickData.saveEvents("BlockChange", listener.getBlockChanges(), (worldLoc, stateId) -> {
+        tickData.saveEvents("BlockChange", listener.getBlockChanges(), (worldLoc, blockKey) -> {
             if (!isInRegion(worldLoc)) return null;
             var minPos = region.getMinimumPoint();
             var loc = worldLoc.subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
 
             var data = new CompoundTag();
-            data.put("BlockId", new IntTag(stateId));
+            data.put("BlockId", new IntTag(getInternalBlockId(blockKey)));
             data.put("Pos", locToListTag(loc));
             return data;
         });
@@ -92,6 +102,14 @@ public class RecordingWriter {
         tag.addDouble(loc.getY());
         tag.addDouble(loc.getZ());
         return tag;
+    }
+
+    private int getInternalBlockId(String blockKey) {
+        var id = blockPalette.get(blockKey);
+        if (id != null) return id;
+
+        blockPalette.put(blockKey, blockPaletteMax);
+        return blockPaletteMax++;
     }
 
     /**

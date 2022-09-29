@@ -7,8 +7,8 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
-import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.github.nova_27.mcplugin.crafterepost.CrafterePost;
+import com.github.nova_27.mcplugin.crafterepost.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -16,13 +16,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class ServerEventListener implements Listener {
-    private final Map<Location, Integer> blockChanges;
+    private final Map<Location, String> blockChanges;
     private final Map<UUID, Location> playerMove;
 
     public ServerEventListener() {
@@ -41,18 +40,16 @@ public class ServerEventListener implements Listener {
 
                 if (packet.getType() == PacketType.Play.Server.BLOCK_CHANGE) {
                     var loc = packet.getBlockPositionModifier().read(0).toLocation(event.getPlayer().getWorld());
-                    var blockData = packet.getBlockData().read(0);
-                    blockChanges.put(loc, getBlockStateId(blockData));
+                    var blockData = loc.getBlock().getBlockData();
+                    blockChanges.put(loc, Utils.getBlockKey(blockData));
                 } else if (packet.getType() == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
                     var sectionPos = packet.getSectionPositions().read(0);
                     var shortLocations = packet.getShortArrays().read(0);
-                    var blockData = packet.getBlockDataArrays().read(0);
-                    assert shortLocations.length == blockData.length;
 
-                    for (int i = 0; i < shortLocations.length; i++) {
-                        var loc = convertShortLocation(event.getPlayer().getWorld(), sectionPos, shortLocations[i]);
-                        var stateId = getBlockStateId(blockData[i]);
-                        blockChanges.put(loc, stateId);
+                    for (short shortLocation : shortLocations) {
+                        var loc = convertShortLocation(event.getPlayer().getWorld(), sectionPos, shortLocation);
+                        var blockData = loc.getBlock().getBlockData();
+                        blockChanges.put(loc, Utils.getBlockKey(blockData));
                     }
                 }
             }
@@ -64,20 +61,6 @@ public class ServerEventListener implements Listener {
         playerMove.put(e.getPlayer().getUniqueId(), e.getTo());
     }
 
-    private static int getBlockStateId(WrappedBlockData blockData) {
-        var id = 0;
-        try {
-            var netMinecraftBlockClass = Class.forName("net.minecraft.world.level.block.Block");
-            var netMinecraftIBlockDataClass = Class.forName("net.minecraft.world.level.block.state.IBlockData");
-            Method getStateIdMethod = netMinecraftBlockClass.getMethod("i", netMinecraftIBlockDataClass);
-
-            id = (int) getStateIdMethod.invoke(null, blockData.getHandle());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return id;
-    }
-
     private static Location convertShortLocation(World world, BlockPosition sectionPosition, short shortLoc) {
         int y = (sectionPosition.getY() * 16) + (shortLoc & 0xF);
         int z = (sectionPosition.getZ() * 16) + ((shortLoc >> 4) & 0xF);
@@ -86,7 +69,7 @@ public class ServerEventListener implements Listener {
     }
 
 
-    public Map<Location, Integer> getBlockChanges() {
+    public Map<Location, String> getBlockChanges() {
         return blockChanges;
     }
 
