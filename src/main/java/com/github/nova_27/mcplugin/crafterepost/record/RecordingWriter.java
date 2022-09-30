@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 public class RecordingWriter {
@@ -25,6 +26,8 @@ public class RecordingWriter {
     private final CompoundTag eventsData;
     private final Map<String, Integer> blockPalette;
     private int blockPaletteMax;
+    private final Map<String, Integer> playerPalette;
+    private int playerPaletteMax;
 
     public RecordingWriter(Region region, long startTicks, File outputFile) {
         this.region = region;
@@ -34,6 +37,8 @@ public class RecordingWriter {
         eventsData = new CompoundTag();
         blockPalette = new HashMap<>();
         blockPaletteMax = 0;
+        playerPalette = new HashMap<>();
+        playerPaletteMax = 0;
 
         data.put("schem", getSchematicCompoundTag());
     }
@@ -59,8 +64,12 @@ public class RecordingWriter {
     public void save() throws IOException {
         var blockPaletteTag = new CompoundTag();
         blockPalette.forEach((blockKey, internalId) -> blockPaletteTag.put(blockKey, new IntTag(internalId)));
-        eventsData.put("blockPalette", blockPaletteTag);
-        eventsData.put("blockPaletteMax", new IntTag(blockPaletteMax));
+        var playerPaletteTag = new CompoundTag();
+        playerPalette.forEach((uuid, internalId) -> playerPaletteTag.put(uuid, new IntTag(internalId)));
+        eventsData.put("BlockPalette", blockPaletteTag);
+        eventsData.put("BlockPaletteMax", new IntTag(blockPaletteMax));
+        eventsData.put("PlayerPalette", playerPaletteTag);
+        eventsData.put("PlayerPaletteMax", new IntTag(playerPaletteMax));
         data.put("events", eventsData);
 
         try (var nbtOut = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(outputFile), true))) {
@@ -85,7 +94,7 @@ public class RecordingWriter {
             var loc = worldLoc.subtract(minPos.getBlockX(), minPos.getBlockY(), minPos.getBlockZ());
 
             var data = new CompoundTag();
-            data.put("Uuid", new StringTag(uuid.toString()));
+            data.put("Id", new IntTag(getInternalPlayerId(uuid)));
             data.put("Pos", locToListTag(loc));
             data.put("Yaw", new FloatTag(loc.getYaw()));
             return data;
@@ -110,6 +119,14 @@ public class RecordingWriter {
 
         blockPalette.put(blockKey, blockPaletteMax);
         return blockPaletteMax++;
+    }
+
+    private int getInternalPlayerId(UUID uuid) {
+        var id = playerPalette.get(uuid.toString());
+        if (id != null) return id;
+
+        playerPalette.put(uuid.toString(), playerPaletteMax);
+        return playerPaletteMax++;
     }
 
     /**
