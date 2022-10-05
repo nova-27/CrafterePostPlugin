@@ -10,9 +10,12 @@
 
 出力したデータを[CrafterePost](https://crafterepost.netlify.app/)に投稿できます。
 
-## 導入
+## 最低要件
 
-現時点では**Spigot 1.18.x**でのみ動作確認済みです。
+- Spigot 1.13以上
+- Java 11以上
+
+## 導入
 
 1. [Releases](https://github.com/nova-27/CrafterePostPlugin/releases)から最新のプラグインをダウンロードします。
 2. 依存プラグインである[WorldEdit](https://dev.bukkit.org/projects/worldedit/files)
