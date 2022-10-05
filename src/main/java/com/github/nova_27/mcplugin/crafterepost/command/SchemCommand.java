@@ -27,11 +27,12 @@ public class SchemCommand extends BaseCommand {
 
     @Override
     public void onCommand(CommandSender sender, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "このコマンドはプレイヤーのみ実行可能です！");
             return;
         }
 
+        Player player = (Player) sender;
         Region region;
         try {
             region = Utils.getSelection(player);

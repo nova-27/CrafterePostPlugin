@@ -26,7 +26,7 @@ dependencies {
 }
 
 shadowJar {
-    if(project.hasProperty('outputDir'))
+    if (project.hasProperty('outputDir'))
         getDestinationDirectory().set(new File(outputDir))
 }
 
@@ -36,7 +36,7 @@ bukkit {
     main = "${project.group}.${rootProject.name.toLowerCase()}.${rootProject.name}"
     description = 'CrafterePost公式プラグイン'
     website = 'https://crafterepost.netlify.app/'
-    apiVersion = '1.18'
+    apiVersion = '1.13'
     author = 'nova27'
     depend = ['WorldEdit', 'ProtocolLib']
 

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecordCommand extends BaseCommand {
     private static final List<String> commands = new ArrayList<>() {
@@ -35,11 +36,12 @@ public class RecordCommand extends BaseCommand {
 
     @Override
     public void onCommand(CommandSender sender, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "このコマンドはプレイヤーのみ実行可能です！");
             return;
         }
 
+        Player player = (Player) sender;
         if (args.length < 1) args = new String[]{""};
 
         var recordingManager = CrafterePost.getInstance().getRecordingManager();
@@ -87,6 +89,6 @@ public class RecordCommand extends BaseCommand {
     @Override
     public @Nullable List<String> onTabComplete(CommandSender sender, String[] args) {
         if (!(sender instanceof Player) || args.length > 1) return null;
-        return commands.stream().filter(cmd -> cmd.startsWith(args[0])).toList();
+        return commands.stream().filter(cmd -> cmd.startsWith(args[0])).collect(Collectors.toList());
     }
 }
