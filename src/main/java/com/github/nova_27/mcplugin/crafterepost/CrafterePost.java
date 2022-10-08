@@ -60,7 +60,7 @@ public class CrafterePost extends JavaPlugin {
             getLogger().info(
                     "新しいバージョンがあります: v{current} -> v{latest}"
                             .replace("{current}", currentVer)
-                            .replace("latest", latestVer)
+                            .replace("{latest}", latestVer)
             );
             getLogger().info("ダウンロード: {link}".replace("{link}", DOWNLOAD_URL)
             );

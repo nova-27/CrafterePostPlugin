@@ -16,9 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ServerEventListener implements Listener {
     private final Map<Location, String> blockChanges;
@@ -43,14 +42,30 @@ public class ServerEventListener implements Listener {
                     var blockData = loc.getBlock().getBlockData();
                     blockChanges.put(loc, Utils.getBlockKey(blockData));
                 } else if (packet.getType() == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
-                    var sectionPos = packet.getSectionPositions().read(0);
-                    var shortLocations = packet.getShortArrays().read(0);
+                    List<Location> locations;
 
-                    for (short shortLocation : shortLocations) {
-                        var loc = convertShortLocation(event.getPlayer().getWorld(), sectionPos, shortLocation);
+                    if (Bukkit.getBukkitVersion().split("-")[0].matches("1\\.((13|14|15).*|16|16\\.1)")) {
+                        // 1.16.1以下だったら
+                        locations = Arrays.stream(
+                                packet.getMultiBlockChangeInfoArrays().read(0)
+                        ).map((info) -> info.getLocation(event.getPlayer().getWorld())).collect(Collectors.toList());
+                    } else {
+                        // 1.16.2以上だったら
+                        locations = new ArrayList<>();
+
+                        var sectionPos = packet.getSectionPositions().read(0);
+                        var shortLocations = packet.getShortArrays().read(0);
+
+                        for (short shortLocation : shortLocations) {
+                            var loc = convertShortLocation(event.getPlayer().getWorld(), sectionPos, shortLocation);
+                            locations.add(loc);
+                        }
+                    }
+
+                    locations.forEach((loc) -> {
                         var blockData = loc.getBlock().getBlockData();
                         blockChanges.put(loc, Utils.getBlockKey(blockData));
-                    }
+                    });
                 }
             }
         });
