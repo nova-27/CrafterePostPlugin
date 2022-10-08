@@ -18,16 +18,18 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
     compileOnly 'org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.9'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     implementation 'com.github.Querz:NBT:6.1'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
 }
 
 shadowJar {
     if (project.hasProperty('outputDir'))
         getDestinationDirectory().set(new File(outputDir))
+
+    relocate 'org.bstats', "${project.group}.${rootProject.name.toLowerCase()}"
 }
 
 bukkit {
