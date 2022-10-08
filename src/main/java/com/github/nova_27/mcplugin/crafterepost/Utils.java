@@ -1,5 +1,6 @@
 package com.github.nova_27.mcplugin.crafterepost;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -16,13 +17,45 @@ import com.sk89q.worldedit.session.SessionManager;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
 public class Utils {
+    private static final String GITHUB_LATEST = "https://api.github.com/repos/nova-27/CrafterePostPlugin/releases/latest";
+
+    /**
+     * プラグインの最新バージョン番号を取得する
+     *
+     * @return バージョン番号 確認に失敗したらnull
+     */
+    public static @Nullable String getLatestVersion() {
+        try {
+            var result = new StringBuilder();
+
+            var url = new URL(GITHUB_LATEST);
+            var con = (HttpURLConnection) url.openConnection();
+            con.connect();
+            var in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+            String line;
+            while ((line = in.readLine()) != null) result.append(line);
+
+            in.close();
+            con.disconnect();
+
+            var mapper = new ObjectMapper();
+            var root = mapper.readTree(result.toString());
+
+            return root.get("tag_name").asText().replace("v", "");
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     /**
      * wand選択範囲を取得する
      *

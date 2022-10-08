@@ -23,6 +23,7 @@ dependencies {
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     implementation 'com.github.Querz:NBT:6.1'
     implementation 'org.bstats:bstats-bukkit:3.0.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
 }
 
 shadowJar {

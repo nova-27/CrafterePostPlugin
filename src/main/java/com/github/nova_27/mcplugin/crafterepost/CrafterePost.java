@@ -14,6 +14,7 @@ import java.util.logging.Level;
 
 public class CrafterePost extends JavaPlugin {
     private static final int PLUGIN_ID = 16605;
+    public static final String DOWNLOAD_URL = "https://github.com/nova-27/CrafterePostPlugin/releases";
 
     private static CrafterePost instance;
     private RecordingManager recordingManager;
@@ -35,19 +36,35 @@ public class CrafterePost extends JavaPlugin {
         recordingManager.runTaskTimer(CrafterePost.getInstance(), 0L, 1L);
 
         if (!getDataFolder().isDirectory() && !getDataFolder().mkdirs()) {
-            getLogger().log(Level.SEVERE, "Failed to create the plugin directory!");
+            getLogger().log(Level.SEVERE, "プラグインフォルダの作成に失敗しました！");
             return;
         }
 
         if (!(Bukkit.getPluginManager().getPlugin("WorldEdit") instanceof WorldEditPlugin)) {
-            getLogger().log(Level.SEVERE, "Could not find WorldEdit plugin!");
+            getLogger().log(Level.SEVERE, "WorldEditプラグインが見つかりません！");
             return;
         }
 
+        // コマンドの登録
         var commandManager = new CommandManager();
         commandManager.register(new SchemCommand());
         commandManager.register(new RecordCommand());
         Objects.requireNonNull(getCommand("crapos")).setExecutor(commandManager);
+
+        // バージョン確認
+        String currentVer = getDescription().getVersion();
+        String latestVer = Utils.getLatestVersion();
+        if (latestVer == null) {
+            getLogger().info("最新バージョンの確認に失敗しました");
+        } else if (!currentVer.equals(latestVer)) {
+            getLogger().info(
+                    "新しいバージョンがあります: v{current} -> v{latest}"
+                            .replace("{current}", currentVer)
+                            .replace("latest", latestVer)
+            );
+            getLogger().info("ダウンロード: {link}".replace("{link}", DOWNLOAD_URL)
+            );
+        }
     }
 
     @Override
