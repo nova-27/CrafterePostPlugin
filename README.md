@@ -10,29 +10,13 @@
 
 出力したデータを[CrafterePost](https://crafterepost.netlify.app/)に投稿できます。
 
-## 最低要件
+## 導入方法
 
-- Spigot 1.13以上
-- Java 11以上
-
-## 導入
-
-1. [Releases](https://github.com/nova-27/CrafterePostPlugin/releases)から最新のプラグインをダウンロードします。
-2. 依存プラグインである[WorldEdit](https://dev.bukkit.org/projects/worldedit/files)
-   と[ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)をダウンロードします。
-3. ダウンロードした3つのプラグインを、Spigotサーバーの`plugins`フォルダに移動します。
+[Wiki](../../wiki/導入方法)をご覧ください。
 
 ## コマンド一覧
 
-- `/crapos schem ファイル名`
-    - WorldEditのwandで選択した範囲をSchematic建築形式で出力します。
-    - 出力ファイル: `plugins/CrafterePost/ファイル名.schem`
-- `/crapos record start ファイル名`
-    - WorldEditのwandで選択した範囲をMCSR録画形式で録画開始します。
-    - 出力ファイル: `plugins/CrafterePost/ファイル名.mcsr`
-- `/crapos record stop`
-    - MCSRの録画を停止します。
-    - 録画中にプレイヤーがサーバーを退出した場合、その時点で自動的に録画を停止します。
+[Wiki](../../wiki/使い方#コマンド一覧)をご覧ください。
 
 ## ビルド
 
