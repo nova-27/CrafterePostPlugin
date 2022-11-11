@@ -5,8 +5,7 @@
 
 このプラグインは、[CrafterePost](https://crafterepost.netlify.app/)公式のSpigotプラグインです。
 
-選択した範囲をSchematic([Sponge Schematic Specification Version 2](https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-2.md))
-建築形式やMCSR(Minecraft Schematic based Recording)録画形式のファイルに出力します。
+選択した範囲をSchematic([Sponge Schematic Specification Version 2](https://github.com/SpongePowered/Schematic-Specification/blob/master/versions/schematic-2.md))建築形式やMCSR(Minecraft Schematic based Recording)録画形式のファイルに出力します。
 
 出力したデータを[CrafterePost](https://crafterepost.netlify.app/)に投稿できます。
 
