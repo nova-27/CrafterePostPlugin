@@ -1,5 +1,6 @@
 [![download](https://img.shields.io/github/downloads/nova-27/CrafterePostPlugin/total?color=blue)](https://github.com/nova-27/CrafterePostPlugin/releases)
 [![license](https://img.shields.io/github/license/nova-27/CrafterePostPlugin?color=b8b8b8)](https://github.com/nova-27/CrafterePostPlugin/blob/main/LICENSE)
+[![Discord](https://img.shields.io/discord/998165329148661781)](https://discord.gg/cps9Rd72ET)
 
 # CrafterePostPlugin
 
